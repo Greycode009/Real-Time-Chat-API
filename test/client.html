@@ -1,0 +1,25 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Socket Test</title>
+  </head>
+  <body>
+    <h1>Socket.IO Test</h1>
+
+    <script src="http://localhost:3000/socket.io/socket.io.js"></script>
+
+    <script>
+      const socket = io("http://localhost:3000");
+
+      socket.on("connect", () => {
+        console.log("Connected to server");
+
+        socket.emit("hello", "Hi I am dipesh");
+      });
+
+      socket.on("connect", () => {
+        console.log("Connected to server");
+      });
+    </script>
+  </body>
+</html>
