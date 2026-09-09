@@ -25,8 +25,8 @@ io.on("connection", (socket) => {
     io.emit("message:receive", message);
   });
 
-  socket.on("disconnect", () => {
-    console.log("A user disconnected");
+  socket.on("disconnect", (reason) => {
+    console.log("A user disconnected", reason);
   });
 });
 
