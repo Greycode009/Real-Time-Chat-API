@@ -15,10 +15,10 @@ const io = new Server(server, {
 io.on("connection", (socket) => {
   console.log("A user connected");
 
-  socket.on("hello", (message) => {
-    console.log("Client says:", message);
+  socket.on("message:send", (message) => {
+    console.log("Message received:", message);
 
-    socket.emit("hello", "Hello from server!");
+    socket.emit("message:receive", message);
   });
 
   socket.on("disconnect", () => {

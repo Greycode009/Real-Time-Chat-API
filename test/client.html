@@ -9,17 +9,17 @@
     <script src="http://localhost:3000/socket.io/socket.io.js"></script>
 
     <script>
-      const socket = io("http://localhost:3000");
+  const socket = io("http://localhost:3000");
 
-      socket.on("connect", () => {
-        console.log("Connected to server");
+  socket.on("connect", () => {
+    console.log("Connected to server");
 
-        socket.emit("hello", "Hi I am dipesh");
-      });
+    socket.emit("message:send", "Hello bro!");
+  });
 
-      socket.on("connect", () => {
-        console.log("Connected to server");
-      });
-    </script>
+  socket.on("message:receive", (message) => {
+    console.log("Message from server:", message);
+  });
+</script>
   </body>
 </html>
