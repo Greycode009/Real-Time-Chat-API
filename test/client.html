@@ -4,22 +4,42 @@
     <title>Socket Test</title>
   </head>
   <body>
-    <h1>Socket.IO Test</h1>
+    <h1>Socket.IO Chat</h1>
+
+    <input type="text" id="messageInput" placeholder="Type a message" />
+    <button id="sendButton">Send</button>
+
+    <div id="messages"></div>
 
     <script src="http://localhost:3000/socket.io/socket.io.js"></script>
 
     <script>
-  const socket = io("http://localhost:3000");
+      const socket = io("http://localhost:3000");
 
-  socket.on("connect", () => {
-    console.log("Connected to server");
+      const messageInput = document.getElementById("messageInput");
+      const sendButton = document.getElementById("sendButton");
+      const messages = document.getElementById("messages");
 
-    socket.emit("message:send", "Hello bro!");
-  });
+      socket.on("connect", () => {
+        console.log("Connected to server");
+      });
 
-  socket.on("message:receive", (message) => {
-    console.log("Message from server:", message);
-  });
-</script>
+      sendButton.addEventListener("click", () => {
+        const message = messageInput.value;
+
+        socket.emit("message:send", message);
+
+        messageInput.value = "";
+      });
+
+      socket.on("message:receive", (message) => {
+        console.log("Message from server:", message);
+
+        const messageElement = document.createElement("p");
+        messageElement.textContent = message;
+
+        messages.appendChild(messageElement);
+      });
+    </script>
   </body>
 </html>
