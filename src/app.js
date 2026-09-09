@@ -16,6 +16,10 @@ io.on("connection", (socket) => {
   console.log("A user connected");
 
   socket.on("message:send", (message) => {
+    if (!message || typeof message.text !== "string" || !message.text.trim()) {
+      return;
+    }
+
     console.log("Message received:", message);
 
     io.emit("message:receive", message);
