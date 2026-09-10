@@ -10,6 +10,7 @@
     <button id="sendButton">Send</button>
 
     <div id="messages"></div>
+    <button id="leaveButton">Leave Room</button>
 
     <script src="http://localhost:3000/socket.io/socket.io.js"></script>
 
@@ -20,16 +21,20 @@
       const sendButton = document.getElementById("sendButton");
       const messages = document.getElementById("messages");
 
+      let currentRoom = null;
+
       socket.on("connect", () => {
         console.log("Connected to server");
 
-        socket.emit("room:join", "developers");
+        currentRoom = "developers";
+        socket.emit("room:join", currentRoom);
       });
 
       sendButton.addEventListener("click", () => {
-        const text = messageInput.value;
+        const message = messageInput.value.trim();
+        if (!message || !currentRoom) return;
 
-        socket.emit("message:send", { text });
+        socket.emit("message:send", { text: message, room: currentRoom });
 
         messageInput.value = "";
       });
@@ -42,6 +47,12 @@
           message && message.text ? message.text : String(message);
 
         messages.appendChild(messageElement);
+      });
+      const leaveButton = document.getElementById("leaveButton");
+
+      leaveButton.addEventListener("click", () => {
+        if (!currentRoom) return;
+        socket.emit("room:leave", currentRoom);
       });
     </script>
   </body>
