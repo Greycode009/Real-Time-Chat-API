@@ -3,13 +3,15 @@ export const registerChatEvents = (io, socket) => {
     if (
       !message ||
       typeof message.text !== "string" ||
-      !message.text.trim()
+      !message.text.trim() ||
+      typeof message.room !== "string" ||
+      !message.room.trim()
     ) {
       return;
     }
 
     console.log("Message received:", message);
 
-    io.emit("message:receive", message);
+    io.to(message.room).emit("message:receive", message);
   });
 };
