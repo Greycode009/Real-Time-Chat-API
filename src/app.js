@@ -15,6 +15,11 @@ const io = new Server(server, {
 io.on("connection", (socket) => {
   console.log("A user connected");
 
+  socket.on("room:join", (room) => {
+    socket.join(room);
+    console.log(`User joined room: ${room}`);
+  });
+
   socket.on("message:send", (message) => {
     if (!message || typeof message.text !== "string" || !message.text.trim()) {
       return;

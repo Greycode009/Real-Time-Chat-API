@@ -22,6 +22,8 @@
 
       socket.on("connect", () => {
         console.log("Connected to server");
+
+        socket.emit("room:join", "developers");
       });
 
       sendButton.addEventListener("click", () => {
