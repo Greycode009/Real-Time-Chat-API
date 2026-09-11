@@ -14,14 +14,22 @@ const io = new Server(server, {
   },
 });
 
+const onlineUsers = new Map();
+
 io.on("connection", (socket) => {
   console.log("A user connected");
+
+  onlineUsers.set(socket.id, true);
+  console.log("Online users:", onlineUsers.size);
 
   registerChatEvents(io, socket);
   registerRoomEvents(io, socket);
 
   socket.on("disconnect", (reason) => {
+    onlineUsers.delete(socket.id);
+
     console.log("A user disconnected:", reason);
+    console.log("Online users:", onlineUsers.size);
   });
 });
 

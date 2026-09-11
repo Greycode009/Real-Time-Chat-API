@@ -1,11 +1,13 @@
 import { getRoomMessages } from "../chat/chat.service.js";
 
 export const registerRoomEvents = (io, socket) => {
-  socket.on("room:join", async (roomId) => {
+  socket.on("room:join", async (room) => {
     if (!room || typeof room !== "string" || !room.trim()) {
       return;
     }
-    socket.join(roomId);
+
+    socket.join(room);
+
     try {
       const messages = await getRoomMessages(room);
 
@@ -15,5 +17,15 @@ export const registerRoomEvents = (io, socket) => {
     } catch (error) {
       console.error("Failed to load message history:", error.message);
     }
+  });
+
+  socket.on("room:leave", (room) => {
+    if (!room || typeof room !== "string" || !room.trim()) {
+      return;
+    }
+
+    socket.leave(room);
+
+    console.log(`User left room: ${room}`);
   });
 };

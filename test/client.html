@@ -188,6 +188,10 @@
     <script>
       const socket = io("http://localhost:3000");
 
+      socket.on("connect_error", (error) => {
+        console.error("Connection error:", error.message);
+      });
+
       const messageInput = document.getElementById("messageInput");
       const sendButton = document.getElementById("sendButton");
       const messages = document.getElementById("messages");
@@ -229,7 +233,7 @@
           addMessage(message);
         });
       });
-      
+
       const leaveButton = document.getElementById("leaveButton");
 
       leaveButton.addEventListener("click", () => {
