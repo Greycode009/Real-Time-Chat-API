@@ -15,6 +15,7 @@
         --muted: #94a3b8;
         --accent: #34d399;
         --danger: #f87171;
+        --warning: #fbbf24;
         --shadow: rgba(15, 23, 42, 0.35);
       }
 
@@ -38,7 +39,7 @@
       }
 
       .chat-shell {
-        width: min(92vw, 760px);
+        width: min(92vw, 780px);
         background: rgba(17, 24, 39, 0.9);
         border: 1px solid rgba(148, 163, 184, 0.15);
         border-radius: 24px;
@@ -51,6 +52,7 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
+        gap: 12px;
         padding: 20px 22px;
         background: linear-gradient(
           135deg,
@@ -62,8 +64,15 @@
 
       .chat-header h1 {
         margin: 0;
-        font-size: clamp(1.4rem, 2vw, 2rem);
+        font-size: clamp(1.3rem, 2vw, 2rem);
         letter-spacing: 0.04em;
+      }
+
+      .header-right {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
       }
 
       .status {
@@ -78,6 +87,11 @@
         font-weight: 700;
       }
 
+      .status.disconnected {
+        background: rgba(248, 113, 113, 0.12);
+        color: #fecaca;
+      }
+
       .status-dot {
         width: 8px;
         height: 8px;
@@ -86,9 +100,88 @@
         box-shadow: 0 0 12px rgba(52, 211, 153, 0.9);
       }
 
+      .status.disconnected .status-dot {
+        background: var(--danger);
+        box-shadow: 0 0 12px rgba(248, 113, 113, 0.8);
+      }
+
+      .room-panel {
+        padding: 18px 20px 14px;
+        background: rgba(15, 23, 42, 0.8);
+        border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+      }
+
+      .room-controls {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+
+      .room-controls label {
+        font-size: 0.85rem;
+        color: var(--muted);
+        font-weight: 700;
+      }
+
+      .room-input,
+      .room-select,
+      .message-input {
+        flex: 1;
+        min-width: 120px;
+        border: 1px solid rgba(148, 163, 184, 0.2);
+        background: rgba(15, 23, 42, 0.9);
+        color: var(--text);
+        border-radius: 12px;
+        padding: 12px 14px;
+        font-size: 0.95rem;
+        outline: none;
+        transition:
+          border-color 0.2s ease,
+          box-shadow 0.2s ease;
+      }
+
+      .room-select {
+        max-width: 160px;
+      }
+
+      .room-input:focus,
+      .room-select:focus,
+      .message-input:focus {
+        border-color: rgba(96, 165, 250, 0.9);
+        box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.2);
+      }
+
+      .room-meta {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+        margin-top: 14px;
+        flex-wrap: wrap;
+      }
+
+      .room-badge,
+      .online-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(15, 23, 42, 0.9);
+        border: 1px solid rgba(148, 163, 184, 0.15);
+        padding: 9px 12px;
+        border-radius: 999px;
+        font-size: 0.85rem;
+        color: var(--muted);
+      }
+
+      .room-badge strong,
+      .online-badge strong {
+        color: var(--text);
+      }
+
       .messages {
-        min-height: 360px;
-        max-height: 480px;
+        min-height: 300px;
+        max-height: 430px;
         overflow-y: auto;
         padding: 22px;
         background: rgba(15, 23, 42, 0.72);
@@ -112,29 +205,10 @@
         border-top: 1px solid rgba(148, 163, 184, 0.12);
       }
 
-      input {
-        flex: 1;
-        border: 1px solid rgba(148, 163, 184, 0.2);
-        background: rgba(15, 23, 42, 0.9);
-        color: var(--text);
-        border-radius: 12px;
-        padding: 14px 16px;
-        font-size: 1rem;
-        outline: none;
-        transition:
-          border-color 0.2s ease,
-          box-shadow 0.2s ease;
-      }
-
-      input:focus {
-        border-color: rgba(96, 165, 250, 0.9);
-        box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.2);
-      }
-
       button {
         border: none;
         border-radius: 12px;
-        padding: 14px 18px;
+        padding: 12px 16px;
         font-weight: 700;
         cursor: pointer;
         transition:
@@ -147,6 +221,7 @@
         filter: brightness(1.04);
       }
 
+      #joinRoomButton,
       #sendButton {
         background: linear-gradient(
           135deg,
@@ -154,7 +229,6 @@
           var(--primary-strong)
         );
         color: white;
-        min-width: 100px;
       }
 
       #leaveButton {
@@ -164,19 +238,93 @@
         margin: 0 20px 20px;
         width: calc(100% - 40px);
       }
+
+      @media (max-width: 640px) {
+        .chat-shell {
+          width: 95vw;
+          border-radius: 18px;
+        }
+
+        .chat-header {
+          padding: 16px 18px;
+          align-items: flex-start;
+        }
+
+        .header-right {
+          width: 100%;
+          justify-content: flex-end;
+        }
+
+        .room-controls {
+          flex-direction: column;
+          align-items: stretch;
+        }
+
+        .room-select {
+          max-width: none;
+        }
+
+        .composer {
+          flex-direction: column;
+        }
+
+        #sendButton,
+        #joinRoomButton {
+          width: 100%;
+        }
+      }
     </style>
   </head>
   <body>
     <div class="chat-shell">
       <div class="chat-header">
         <h1>Socket.IO Chat</h1>
-        <div class="status"><span class="status-dot"></span> Live</div>
+        <div class="header-right">
+          <div id="connectionStatus" class="status disconnected">
+            <span class="status-dot"></span>
+            <span>Disconnected</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="room-panel">
+        <div class="room-controls">
+          <label for="roomInput">Room</label>
+          <input
+            id="roomInput"
+            class="room-input"
+            type="text"
+            value="developers"
+            placeholder="Enter room name"
+          />
+          <select id="roomPreset" class="room-select">
+            <option value="developers">developers</option>
+            <option value="design">design</option>
+            <option value="support">support</option>
+            <option value="random">random</option>
+          </select>
+          <button id="joinRoomButton">Join Room</button>
+        </div>
+
+        <div class="room-meta">
+          <div class="room-badge">
+            Current room: <strong id="currentRoomLabel">None</strong>
+          </div>
+          <div class="online-badge">
+            Online: <strong id="onlineUsers">0</strong>
+          </div>
+        </div>
       </div>
 
       <div id="messages" class="messages" aria-live="polite"></div>
 
       <div class="composer">
-        <input type="text" id="messageInput" placeholder="Type a message..." />
+        <input
+          type="text"
+          id="messageInput"
+          class="message-input"
+          placeholder="Type a message..."
+        />
         <button id="sendButton">Send</button>
       </div>
 
@@ -188,15 +336,42 @@
     <script>
       const socket = io("http://localhost:3000");
 
-      socket.on("connect_error", (error) => {
-        console.error("Connection error:", error.message);
-      });
-
+      const roomInput = document.getElementById("roomInput");
+      const roomPreset = document.getElementById("roomPreset");
+      const joinRoomButton = document.getElementById("joinRoomButton");
+      const currentRoomLabel = document.getElementById("currentRoomLabel");
+      const connectionStatus = document.getElementById("connectionStatus");
+      const onlineUsers = document.getElementById("onlineUsers");
       const messageInput = document.getElementById("messageInput");
       const sendButton = document.getElementById("sendButton");
       const messages = document.getElementById("messages");
+      const leaveButton = document.getElementById("leaveButton");
 
       let currentRoom = null;
+
+      const updateConnectionStatus = (connected) => {
+        if (connected) {
+          connectionStatus.classList.remove("disconnected");
+          connectionStatus.innerHTML =
+            '<span class="status-dot"></span><span>Connected</span>';
+        } else {
+          connectionStatus.classList.add("disconnected");
+          connectionStatus.innerHTML =
+            '<span class="status-dot"></span><span>Disconnected</span>';
+        }
+      };
+
+      const updateRoomLabel = (room) => {
+        currentRoomLabel.textContent = room || "None";
+      };
+
+      const updateOnlineCount = (count) => {
+        onlineUsers.textContent = Number(count || 0);
+      };
+
+      const clearMessages = () => {
+        messages.innerHTML = "";
+      };
 
       const addMessage = (message) => {
         const messageElement = document.createElement("p");
@@ -204,45 +379,97 @@
           message && message.text ? message.text : String(message);
 
         messages.appendChild(messageElement);
+        messages.scrollTop = messages.scrollHeight;
+      };
+
+      const joinRoom = (roomName) => {
+        const room = String(roomName || "").trim();
+
+        if (!room) return;
+
+        if (currentRoom && currentRoom !== room) {
+          socket.emit("room:leave", currentRoom);
+        }
+
+        currentRoom = room;
+        roomInput.value = room;
+        roomPreset.value = room;
+        updateRoomLabel(room);
+        clearMessages();
+
+        socket.emit("room:join", room);
       };
 
       socket.on("connect", () => {
         console.log("Connected to server");
+        updateConnectionStatus(true);
 
-        currentRoom = "developers";
-        socket.emit("room:join", currentRoom);
+        const defaultRoom = roomInput.value.trim() || "developers";
+        joinRoom(defaultRoom);
+      });
+
+      socket.on("disconnect", () => {
+        console.log("Disconnected from server");
+        updateConnectionStatus(false);
+      });
+
+      socket.on("connect_error", (error) => {
+        console.error("Connection error:", error.message);
+        updateConnectionStatus(false);
       });
 
       sendButton.addEventListener("click", () => {
         const message = messageInput.value.trim();
+
         if (!message || !currentRoom) return;
 
         socket.emit("message:send", { text: message, room: currentRoom });
-
         messageInput.value = "";
+      });
+
+      messageInput.addEventListener("keydown", (event) => {
+        if (event.key === "Enter") {
+          sendButton.click();
+        }
+      });
+
+      joinRoomButton.addEventListener("click", () => {
+        joinRoom(roomInput.value);
+      });
+
+      roomPreset.addEventListener("change", (event) => {
+        const selectedRoom = event.target.value;
+        if (selectedRoom) {
+          roomInput.value = selectedRoom;
+          joinRoom(selectedRoom);
+        }
       });
 
       socket.on("message:receive", (message) => {
         console.log("Message from server:", message);
-
         addMessage(message);
       });
 
-      socket.on("message:history", (messages) => {
-        messages.forEach((message) => {
+      socket.on("message:history", (messageList) => {
+        if (!Array.isArray(messageList)) return;
+
+        messageList.forEach((message) => {
           addMessage(message);
         });
       });
 
-      const leaveButton = document.getElementById("leaveButton");
-
       leaveButton.addEventListener("click", () => {
         if (!currentRoom) return;
+
         socket.emit("room:leave", currentRoom);
+        currentRoom = null;
+        updateRoomLabel("None");
+        clearMessages();
       });
 
       socket.on("presence:update", (presence) => {
-        console.log("Online users:", presence.onlineCount);
+        if (!presence) return;
+        updateOnlineCount(presence.onlineCount);
       });
     </script>
   </body>
