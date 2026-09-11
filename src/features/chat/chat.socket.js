@@ -1,5 +1,7 @@
+import Message from "./message.model.js";
+
 export const registerChatEvents = (io, socket) => {
-  socket.on("message:send", (message) => {
+  socket.on("message:send", async (message) => {
     if (
       !message ||
       typeof message.text !== "string" ||
@@ -10,8 +12,15 @@ export const registerChatEvents = (io, socket) => {
       return;
     }
 
-    console.log("Message received:", message);
+    try {
+      const savedMessage = await Message.create({
+        text: message.text,
+        room: message.room,
+      });
 
-    io.to(message.room).emit("message:receive", message);
+      io.to(message.room).emit("message:receive", savedMessage);
+    } catch (error) {
+      console.error("Error saving message:", error.message);
+    }
   });
 };
