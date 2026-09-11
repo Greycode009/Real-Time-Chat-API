@@ -240,6 +240,10 @@
         if (!currentRoom) return;
         socket.emit("room:leave", currentRoom);
       });
+
+      socket.on("presence:update", (presence) => {
+        console.log("Online users:", presence.onlineCount);
+      });
     </script>
   </body>
 </html>

@@ -20,7 +20,10 @@ io.on("connection", (socket) => {
   console.log("A user connected");
 
   onlineUsers.set(socket.id, true);
-  console.log("Online users:", onlineUsers.size);
+
+  io.emit("presence:update", {
+    onlineCount: onlineUsers.size,
+  });
 
   registerChatEvents(io, socket);
   registerRoomEvents(io, socket);
@@ -29,7 +32,10 @@ io.on("connection", (socket) => {
     onlineUsers.delete(socket.id);
 
     console.log("A user disconnected:", reason);
-    console.log("Online users:", onlineUsers.size);
+
+    io.emit("presence:update", {
+      onlineCount: onlineUsers.size,
+    });
   });
 });
 
