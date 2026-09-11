@@ -1,14 +1,36 @@
-export const registerRoomEvents = (io, socket) => {
-  socket.on("room:join", (roomId) => {
-    socket.join(roomId);
+import { getRoomMessages } from "../chat/chat.service.js";
+import { addUser } from "../presence/presence.service.js";
 
-    console.log(`User joined room: ${roomId}`);
+export const registerRoomEvents = (io, socket) => {
+  socket.on("room:join", async (room) => {
+    if (!room || typeof room !== "string" || !room.trim()) {
+      return;
+    }
+
+    socket.join(room);
+    addUser(socket.id, room);
+    socket.to(room).emit("presence:update", {
+      status: "online",
+    });
+
+    try {
+      const messages = await getRoomMessages(room);
+
+      socket.emit("message:history", messages);
+
+      console.log(`User joined room: ${room}`);
+    } catch (error) {
+      console.error("Failed to load message history:", error.message);
+    }
   });
 
-  socket.on("room:leave", (roomId) => {
-    socket.leave(roomId);
+  socket.on("room:leave", (room) => {
+    if (!room || typeof room !== "string" || !room.trim()) {
+      return;
+    }
 
-    console.log(`User left room: ${roomId}`);
-    socket.emit("room:leave", roomId);   
+    socket.leave(room);
+
+    console.log(`User left room: ${room}`);
   });
 };
