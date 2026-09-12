@@ -16,6 +16,7 @@ export const registerChatEvents = (io, socket) => {
       const savedMessage = await Message.create({
         text: message.text,
         room: message.room,
+        sender: socket.username,
       });
 
       io.to(message.room).emit("message:receive", savedMessage);

@@ -25,7 +25,10 @@ const onlineUsers = new Map();
 
 io.on("connection", (socket) => {
   const username = socket.handshake.auth.username;
-  console.log(`User connected: ${username}`);
+
+  socket.username = username;
+
+  console.log(`User connected: ${socket.username}`);
 
   io.emit("presence:update", {
     onlineCount: getOnlineCount(),
