@@ -24,7 +24,11 @@ const io = new Server(server, {
 const onlineUsers = new Map();
 
 io.on("connection", (socket) => {
-  console.log("A user connected");
+  const username = socket.handshake.auth.username;
+
+  socket.username = username;
+
+  console.log(`User connected: ${socket.username}`);
 
   io.emit("presence:update", {
     onlineCount: getOnlineCount(),
