@@ -10,6 +10,7 @@ import {
   getOnlineCount,
   getUserRoom,
 } from "./features/presence/presence.service.js";
+import { authenticateSocket } from "./features/auth/auth.socket.js";
 
 const app = express();
 
@@ -21,13 +22,13 @@ const io = new Server(server, {
   },
 });
 
+io.use(authenticateSocket);
+
 const onlineUsers = new Map();
 
 io.on("connection", (socket) => {
-  const username = socket.handshake.auth.username;
-
-  socket.username = username;
-
+  
+  socket.username = socket.user.username;
   console.log(`User connected: ${socket.username}`);
 
   io.emit("presence:update", {
