@@ -334,10 +334,11 @@
     <script src="http://localhost:3000/socket.io/socket.io.js"></script>
 
     <script>
-      const socket = io("http://localhost:3000",{
-        auth:{
-          username : "Dipesh",
-        }
+      const socket = io("http://localhost:3000", {
+        auth: {
+          token:
+           "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InRlc3QtdXNlci0xIiwidXNlcm5hbWUiOiJEaXBlc2giLCJpYXQiOjE3ODkzMTUwMTIsImV4cCI6MTc4OTMxODYxMn0.htfc9tjmLESn8Om8TroP2-RimCaKw4X464v5P-r6hIo",
+        },
       });
 
       const roomInput = document.getElementById("roomInput");
