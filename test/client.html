@@ -337,7 +337,7 @@
       const socket = io("http://localhost:3000", {
         auth: {
           token:
-           "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InRlc3QtdXNlci0xIiwidXNlcm5hbWUiOiJEaXBlc2giLCJpYXQiOjE3ODkzMTUwMTIsImV4cCI6MTc4OTMxODYxMn0.htfc9tjmLESn8Om8TroP2-RimCaKw4X464v5P-r6hIo",
+            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InRlc3QtdXNlci0xIiwidXNlcm5hbWUiOiJEaXBlc2giLCJpYXQiOjE3ODk0MDc0NTksImV4cCI6MTc4OTQxMTA1OX0.AH115tXwZz9zMYc8eVh9sQgJqZpmTCGqHE7qrIcl9mU",
         },
       });
 
@@ -396,13 +396,18 @@
           socket.emit("room:leave", currentRoom);
         }
 
-        currentRoom = room;
-        roomInput.value = room;
-        roomPreset.value = room;
-        updateRoomLabel(room);
-        clearMessages();
-
         socket.emit("room:join", room);
+
+        socket.on("room:joined", (room) => {
+          currentRoom = room;
+          roomInput.value = room;
+          roomPreset.value = room;
+          updateRoomLabel(room);
+          clearMessages();
+        });
+        socket.on("room:error", (message) => {
+          alert(message);
+        });
       };
 
       socket.on("connect", () => {

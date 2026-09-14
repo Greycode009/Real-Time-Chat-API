@@ -7,7 +7,13 @@ export const registerRoomEvents = (io, socket) => {
       return;
     }
 
+    if (room === "admin" && socket.user.username !== "Dipesh") {
+      socket.emit("room:error", "You are not allowed to join this room");
+      return;
+    }
     socket.join(room);
+    socket.emit("room:joined", room);
+    
     addUser(socket.id, room);
     socket.to(room).emit("presence:update", {
       status: "online",
