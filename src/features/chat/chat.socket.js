@@ -1,4 +1,5 @@
 import Message from "./message.model.js";
+import { sendNotification } from "../notification/notification.socket.js";
 
 export const registerChatEvents = (io, socket) => {
   socket.on("message:send", async (message) => {
@@ -20,6 +21,11 @@ export const registerChatEvents = (io, socket) => {
       });
 
       io.to(message.room).emit("message:receive", savedMessage);
+      sendNotification(socket, message.room, {
+        sender: socket.username,
+        room: message.room,
+        text: message.text,
+      });
     } catch (error) {
       console.error("Error saving message:", error.message);
     }
