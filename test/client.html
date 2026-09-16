@@ -999,7 +999,7 @@
       const socket = io("http://localhost:3000", {
         auth: {
           token:
-            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InRlc3QtdXNlci0xIiwidXNlcm5hbWUiOiJEaXBlc2giLCJpYXQiOjE3ODk0OTA2MDcsImV4cCI6MTc4OTQ5NDIwN30.mybIrOLyeZoXqa0l0R4DOBm7Rb0DwQYeJfNslSYaA_k",
+            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InRlc3QtdXNlci0xIiwidXNlcm5hbWUiOiJEaXBlc2giLCJpYXQiOjE3ODk1ODAxNDUsImV4cCI6MTc4OTU4Mzc0NX0.SCE9gXNPC301I5ol14bUJfB9KmMib9k2dTArZManXkQ",
         },
       });
 
@@ -1287,8 +1287,8 @@
         console.log("Connected to server");
         updateConnectionStatus(true);
 
-        const defaultRoom = roomInput.value.trim() || "developers";
-        joinRoom(defaultRoom);
+        const room = currentRoom || "developers";
+        joinRoom(room);
       });
 
       socket.on("disconnect", () => {
