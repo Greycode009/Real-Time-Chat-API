@@ -70,6 +70,100 @@
         overflow: hidden;
       }
 
+      .app[hidden] {
+        display: none;
+      }
+
+      /* ---------- Login ---------- */
+
+      .login-screen {
+        display: grid;
+        place-items: center;
+        min-height: 100vh;
+        min-height: 100dvh;
+        padding: 24px 16px;
+      }
+
+      .login-screen[hidden] {
+        display: none;
+      }
+
+      .login-card {
+        display: flex;
+        flex-direction: column;
+        width: min(360px, 100%);
+        padding: 26px 24px 22px;
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        background: var(--bg-sidebar);
+        box-shadow: 0 18px 50px rgba(0, 0, 0, 0.4);
+      }
+
+      .login-card .brand-mark {
+        margin-bottom: 14px;
+      }
+
+      .login-card h1 {
+        margin: 0;
+        font-size: 1.15rem;
+        font-weight: 650;
+        letter-spacing: -0.01em;
+      }
+
+      .login-sub {
+        margin: 3px 0 20px;
+        font-size: 0.82rem;
+        color: var(--text-faint);
+      }
+
+      .login-card label {
+        margin-bottom: 5px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        color: var(--text-dim);
+      }
+
+      .login-card .text-input {
+        margin-bottom: 14px;
+        padding: 10px 12px;
+        font-size: 0.9rem;
+      }
+
+      .login-error {
+        margin: 0 0 12px;
+        padding: 9px 11px;
+        border: 1px solid rgba(237, 66, 69, 0.4);
+        border-radius: 8px;
+        background: rgba(237, 66, 69, 0.1);
+        color: #f4989a;
+        font-size: 0.8rem;
+      }
+
+      .login-error[hidden] {
+        display: none;
+      }
+
+      .login-submit {
+        width: 100%;
+        padding: 11px 14px;
+        font-size: 0.9rem;
+      }
+
+      .login-submit:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+
+      .login-hint {
+        margin: 14px 0 0;
+        font-size: 0.72rem;
+        line-height: 1.5;
+        color: var(--text-faint);
+        text-align: center;
+      }
+
       /* ---------- Sidebar ---------- */
 
       .sidebar {
@@ -762,6 +856,14 @@
         color: var(--text-faint);
       }
 
+      .typing-indicator {
+        min-height: 16px;
+        margin: 0 2px 6px;
+        font-size: 0.75rem;
+        font-style: italic;
+        color: var(--text-dim);
+      }
+
       /* ---------- Toast ---------- */
 
       .toast-stack {
@@ -866,7 +968,52 @@
     </style>
   </head>
   <body>
-    <div class="app" id="app">
+    <!-- ---------------- Login (shown until a JWT exists) ---------------- -->
+    <div class="login-screen" id="loginScreen" hidden>
+      <form class="login-card" id="loginForm" autocomplete="on">
+        <div class="brand-mark" aria-hidden="true">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
+          </svg>
+        </div>
+
+        <h1>Real-Time Chat</h1>
+        <p class="login-sub">Sign in to connect to the server</p>
+
+        <label for="loginUsername">Username</label>
+        <input
+          id="loginUsername"
+          class="text-input"
+          type="text"
+          name="username"
+          autocomplete="username"
+          required
+        />
+
+        <label for="loginPassword">Password</label>
+        <input
+          id="loginPassword"
+          class="text-input"
+          type="password"
+          name="password"
+          autocomplete="current-password"
+          required
+        />
+
+        <p class="login-error" id="loginError" role="alert" hidden></p>
+
+        <button type="submit" class="btn-primary login-submit" id="loginSubmit">
+          Sign in
+        </button>
+
+        <p class="login-hint">
+          Signs in through <strong>POST /auth/login</strong>. Create accounts
+          with <strong>POST /auth/register</strong> first.
+        </p>
+      </form>
+    </div>
+
+    <div class="app" id="app" hidden>
       <!-- ---------------- Sidebar ---------------- -->
       <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
@@ -915,6 +1062,15 @@
             <span class="avatar" id="selfAvatar">?</span>
             <span>Signed in as <strong id="selfName">...</strong></span>
           </div>
+
+          <button id="logoutButton" class="btn-ghost">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+              <polyline points="16 17 21 12 16 7" />
+              <line x1="21" y1="12" x2="9" y2="12" />
+            </svg>
+            Log out
+          </button>
         </div>
       </aside>
 
@@ -971,6 +1127,7 @@
         <div id="messages" class="messages" aria-live="polite"></div>
 
         <div class="composer">
+          <p class="typing-indicator" id="typingIndicator" aria-live="polite"></p>
           <div class="composer-inner">
             <input
               type="text"
@@ -996,14 +1153,22 @@
     <script src="http://localhost:3000/socket.io/socket.io.js"></script>
 
     <script>
-      const socket = io("http://localhost:3000", {
-        auth: {
-          token:
-            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InRlc3QtdXNlci0xIiwidXNlcm5hbWUiOiJEaXBlc2giLCJpYXQiOjE3ODk1ODAxNDUsImV4cCI6MTc4OTU4Mzc0NX0.SCE9gXNPC301I5ol14bUJfB9KmMib9k2dTArZManXkQ",
-        },
-      });
+      const SERVER_URL = "http://localhost:3000";
+      const TOKEN_KEY = "chat.token";
+
+      /* The socket is created only once a JWT exists (see connectSocket). */
+      let socket = null;
+      let currentUsername = null;
 
       const app = document.getElementById("app");
+      const loginScreen = document.getElementById("loginScreen");
+      const loginForm = document.getElementById("loginForm");
+      const loginUsername = document.getElementById("loginUsername");
+      const loginPassword = document.getElementById("loginPassword");
+      const loginError = document.getElementById("loginError");
+      const loginSubmit = document.getElementById("loginSubmit");
+      const logoutButton = document.getElementById("logoutButton");
+      const typingIndicator = document.getElementById("typingIndicator");
       const scrim = document.getElementById("scrim");
       const sidebarToggle = document.getElementById("sidebarToggle");
       const roomList = document.getElementById("roomList");
@@ -1094,11 +1259,10 @@
         });
       };
 
-      /* ---------- Identity: read-only decode of the existing JWT ---------- */
+      /* ---------- Identity: read-only decode of the JWT from /auth/login ---------- */
 
-      const readUsernameFromToken = () => {
+      const readUsernameFromToken = (token) => {
         try {
-          const token = socket.auth && socket.auth.token;
           const payload = token ? token.split(".")[1] : null;
           if (!payload) return null;
           const json = atob(payload.replace(/-/g, "+").replace(/_/g, "/"));
@@ -1109,10 +1273,6 @@
           return null;
         }
       };
-
-      const currentUsername = readUsernameFromToken();
-      selfName.textContent = currentUsername || "Unknown user";
-      selfAvatar.textContent = (currentUsername || "?").charAt(0);
 
       /* ---------- UI helpers ---------- */
 
@@ -1259,7 +1419,7 @@
       const joinRoom = (roomName) => {
         const room = String(roomName || "").trim();
 
-        if (!room) return;
+        if (!room || !socket) return;
 
         if (currentRoom && currentRoom !== room) {
           socket.emit("room:leave", currentRoom);
@@ -1268,48 +1428,199 @@
         socket.emit("room:join", room);
       };
 
-      /* Registered once: only the server confirms that a room was joined. */
-      socket.on("room:joined", (room) => {
-        currentRoom = room;
-        roomInput.value = room;
-        updateRoomLabel(room);
-        clearMessages();
-      });
+      /* ---------- Typing indicator ---------- */
 
-      socket.on("room:error", (message) => {
-        showToast(String(message));
-        /* Keep showing the room we are actually in. */
-        updateRoomLabel(currentRoom);
-        if (currentRoom) roomInput.value = currentRoom;
-      });
+      const TYPING_IDLE_MS = 1200;
+      const TYPING_EXPIRY_MS = 5000;
 
-      socket.on("connect", () => {
-        console.log("Connected to server");
-        updateConnectionStatus(true);
+      let typingTimer = null;
+      let typingSent = false;
 
-        const room = currentRoom || "developers";
-        joinRoom(room);
-      });
+      /* username -> expiry timer, so a missed stop-typing cannot get stuck */
+      const typingUsers = new Map();
 
-      socket.on("disconnect", () => {
-        console.log("Disconnected from server");
-        updateConnectionStatus(false);
-      });
+      const renderTypingIndicator = () => {
+        const names = [...typingUsers.keys()];
 
-      socket.on("connect_error", (error) => {
-        console.error("Connection error:", error.message);
-        updateConnectionStatus(false);
-        showToast("Connection error: " + error.message);
-      });
+        if (names.length === 0) {
+          typingIndicator.textContent = "";
+        } else if (names.length === 1) {
+          typingIndicator.textContent = names[0] + " is typing...";
+        } else if (names.length === 2) {
+          typingIndicator.textContent = names.join(" and ") + " are typing...";
+        } else {
+          typingIndicator.textContent = names.length + " people are typing...";
+        }
+      };
+
+      const clearTypingUser = (username) => {
+        clearTimeout(typingUsers.get(username));
+        typingUsers.delete(username);
+        renderTypingIndicator();
+      };
+
+      const clearAllTypingUsers = () => {
+        typingUsers.forEach((timer) => clearTimeout(timer));
+        typingUsers.clear();
+        renderTypingIndicator();
+      };
+
+      const stopTyping = () => {
+        clearTimeout(typingTimer);
+
+        if (!typingSent) return;
+
+        typingSent = false;
+        if (socket && currentRoom) socket.emit("user:stop-typing", currentRoom);
+      };
+
+      const startTyping = () => {
+        if (!socket || !currentRoom) return;
+
+        if (!typingSent) {
+          socket.emit("user:typing", currentRoom);
+          typingSent = true;
+        }
+
+        clearTimeout(typingTimer);
+        typingTimer = setTimeout(stopTyping, TYPING_IDLE_MS);
+      };
+
+      /* ---------- Socket handlers (registered per connection) ---------- */
+
+      const registerSocketHandlers = () => {
+        /* Only the server confirms that a room was joined. */
+        socket.on("room:joined", (room) => {
+          currentRoom = room;
+          roomInput.value = room;
+          updateRoomLabel(room);
+          clearMessages();
+          typingSent = false;
+          clearAllTypingUsers();
+        });
+
+        socket.on("room:error", (message) => {
+          showToast(String(message));
+          /* Keep showing the room we are actually in. */
+          updateRoomLabel(currentRoom);
+          if (currentRoom) roomInput.value = currentRoom;
+        });
+
+        socket.on("connect", () => {
+          console.log("Connected to server");
+          updateConnectionStatus(true);
+
+          const room = currentRoom || "developers";
+          joinRoom(room);
+        });
+
+        socket.on("disconnect", () => {
+          console.log("Disconnected from server");
+          updateConnectionStatus(false);
+          clearAllTypingUsers();
+        });
+
+        socket.on("connect_error", (error) => {
+          console.error("Connection error:", error.message);
+          updateConnectionStatus(false);
+
+          /* The server rejects a missing/expired token in the handshake. */
+          if (
+            error.message === "Invalid token" ||
+            error.message === "Authentication required"
+          ) {
+            logout("Session expired. Please sign in again.");
+            return;
+          }
+
+          showToast("Connection error: " + error.message);
+        });
+
+        socket.on("message:receive", (message) => {
+          console.log("Message from server:", message);
+          addMessage(message);
+
+          /* A delivered message ends that sender's typing state. */
+          if (message && message.sender) clearTypingUser(message.sender);
+        });
+
+        socket.on("message:history", (messageList) => {
+          if (!Array.isArray(messageList)) return;
+
+          messageList.forEach((message) => {
+            addMessage(message);
+          });
+        });
+
+        socket.on("presence:update", (presence) => {
+          if (!presence) return;
+          /* The server sends onlineCount on connection events; the room-level
+             presence payloads only carry a status, so keep the last count. */
+          if (typeof presence.onlineCount === "number") {
+            updateOnlineCount(presence.onlineCount);
+          }
+        });
+
+        socket.on("user:typing", (payload) => {
+          if (!payload || !payload.username) return;
+          if (payload.username === currentUsername) return;
+
+          clearTimeout(typingUsers.get(payload.username));
+          typingUsers.set(
+            payload.username,
+            setTimeout(() => clearTypingUser(payload.username), TYPING_EXPIRY_MS),
+          );
+          renderTypingIndicator();
+        });
+
+        socket.on("user:stop-typing", (payload) => {
+          if (!payload || !payload.username) return;
+          clearTypingUser(payload.username);
+        });
+
+        socket.on("notification:new", (notification) => {
+          console.log("Notification from server:", notification);
+
+          if (!notification || typeof notification !== "object") return;
+
+          notifications.unshift({
+            sender: notification.sender || "Unknown",
+            room: notification.room || "",
+            text: notification.text || "",
+            /* The payload carries no timestamp today; fall back to arrival. */
+            receivedAt: new Date(
+              notification.createdAt || Date.now(),
+            ).getTime(),
+            /* Anything shown while the panel is open counts as seen. */
+            read: !notifPanel.hidden,
+          });
+
+          if (notifications.length > MAX_NOTIFICATIONS) {
+            notifications.length = MAX_NOTIFICATIONS;
+          }
+
+          renderNotifications();
+          updateNotifBadge();
+        });
+      };
 
       sendButton.addEventListener("click", () => {
         const message = messageInput.value.trim();
 
-        if (!message || !currentRoom) return;
+        if (!message || !currentRoom || !socket) return;
 
         socket.emit("message:send", { text: message, room: currentRoom });
+        stopTyping();
         messageInput.value = "";
         messageInput.focus();
+      });
+
+      messageInput.addEventListener("input", () => {
+        if (messageInput.value.trim()) {
+          startTyping();
+        } else {
+          stopTyping();
+        }
       });
 
       messageInput.addEventListener("keydown", (event) => {
@@ -1328,35 +1639,15 @@
         }
       });
 
-      socket.on("message:receive", (message) => {
-        console.log("Message from server:", message);
-        addMessage(message);
-      });
-
-      socket.on("message:history", (messageList) => {
-        if (!Array.isArray(messageList)) return;
-
-        messageList.forEach((message) => {
-          addMessage(message);
-        });
-      });
-
       leaveButton.addEventListener("click", () => {
-        if (!currentRoom) return;
+        if (!currentRoom || !socket) return;
 
+        stopTyping();
         socket.emit("room:leave", currentRoom);
         currentRoom = null;
         updateRoomLabel(null);
         clearMessages();
-      });
-
-      socket.on("presence:update", (presence) => {
-        if (!presence) return;
-        /* The server sends onlineCount on connection events; the room-level
-           presence payloads only carry a status, so keep the last count. */
-        if (typeof presence.onlineCount === "number") {
-          updateOnlineCount(presence.onlineCount);
-        }
+        clearAllTypingUsers();
       });
 
       /* ---------- Notifications (fed by the server's notification:new) ---------- */
@@ -1455,31 +1746,6 @@
         updateNotifBadge();
       };
 
-      socket.on("notification:new", (notification) => {
-        console.log("Notification from server:", notification);
-
-        if (!notification || typeof notification !== "object") return;
-
-        notifications.unshift({
-          sender: notification.sender || "Unknown",
-          room: notification.room || "",
-          text: notification.text || "",
-          /* The payload carries no timestamp today; fall back to arrival. */
-          receivedAt: new Date(
-            notification.createdAt || Date.now(),
-          ).getTime(),
-          /* Anything shown while the panel is open counts as seen. */
-          read: !notifPanel.hidden,
-        });
-
-        if (notifications.length > MAX_NOTIFICATIONS) {
-          notifications.length = MAX_NOTIFICATIONS;
-        }
-
-        renderNotifications();
-        updateNotifBadge();
-      });
-
       /* Keep the relative labels honest without re-rendering the list. */
       setInterval(() => {
         notifList.querySelectorAll("time[data-ts]").forEach((time) => {
@@ -1523,6 +1789,134 @@
 
       scrim.addEventListener("click", closeSidebar);
 
+      /* ---------- Authentication ---------- */
+
+      const readStoredToken = () => {
+        try {
+          return localStorage.getItem(TOKEN_KEY);
+        } catch (error) {
+          console.warn("localStorage unavailable:", error.message);
+          return null;
+        }
+      };
+
+      const storeToken = (token) => {
+        try {
+          localStorage.setItem(TOKEN_KEY, token);
+        } catch (error) {
+          console.warn("Could not store token:", error.message);
+        }
+      };
+
+      const clearStoredToken = () => {
+        try {
+          localStorage.removeItem(TOKEN_KEY);
+        } catch (error) {
+          console.warn("Could not clear token:", error.message);
+        }
+      };
+
+      const showLogin = (message) => {
+        app.hidden = true;
+        loginScreen.hidden = false;
+        loginError.hidden = !message;
+        loginError.textContent = message || "";
+        loginPassword.value = "";
+        loginUsername.focus();
+      };
+
+      const showChat = () => {
+        loginScreen.hidden = true;
+        app.hidden = false;
+      };
+
+      /* Creates the socket. Never called without a token. */
+      const connectSocket = (token) => {
+        currentUsername = readUsernameFromToken(token);
+        selfName.textContent = currentUsername || "Unknown user";
+        selfAvatar.textContent = (currentUsername || "?").charAt(0);
+
+        socket = io(SERVER_URL, {
+          auth: { token },
+        });
+
+        registerSocketHandlers();
+      };
+
+      function logout(message) {
+        clearStoredToken();
+
+        if (socket) {
+          socket.disconnect();
+          socket = null;
+        }
+
+        currentRoom = null;
+        currentUsername = null;
+        typingSent = false;
+        clearTimeout(typingTimer);
+        clearAllTypingUsers();
+
+        notifications.length = 0;
+        renderNotifications();
+        updateNotifBadge();
+
+        updateConnectionStatus(false);
+        updateRoomLabel(null);
+        clearMessages();
+        showLogin(message);
+      }
+
+      loginForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+
+        const username = loginUsername.value.trim();
+        const password = loginPassword.value;
+
+        if (!username || !password) return;
+
+        loginSubmit.disabled = true;
+        loginSubmit.textContent = "Signing in...";
+        loginError.hidden = true;
+
+        try {
+          const response = await fetch(SERVER_URL + "/auth/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ username, password }),
+          });
+
+          const data = await response.json().catch(() => ({}));
+
+          if (!response.ok) {
+            /* Show the server's own error message. */
+            throw new Error(data.message || "Login failed (" + response.status + ")");
+          }
+
+          if (!data.token) {
+            throw new Error("Login response did not include a token");
+          }
+
+          storeToken(data.token);
+          loginPassword.value = "";
+          showChat();
+          connectSocket(data.token);
+        } catch (error) {
+          loginError.textContent =
+            error.name === "TypeError"
+              ? "Could not reach " + SERVER_URL + ". Is the server running?"
+              : error.message;
+          loginError.hidden = false;
+        } finally {
+          loginSubmit.disabled = false;
+          loginSubmit.textContent = "Sign in";
+        }
+      });
+
+      logoutButton.addEventListener("click", () => {
+        logout("");
+      });
+
       /* ---------- Boot ---------- */
 
       renderRoomList();
@@ -1531,6 +1925,15 @@
       updateConnectionStatus(false);
       updateRoomLabel(null);
       clearMessages();
+
+      const storedToken = readStoredToken();
+
+      if (storedToken) {
+        showChat();
+        connectSocket(storedToken);
+      } else {
+        showLogin("");
+      }
     </script>
   </body>
 </html>
