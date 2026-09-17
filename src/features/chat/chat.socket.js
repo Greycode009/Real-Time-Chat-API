@@ -30,4 +30,20 @@ export const registerChatEvents = (io, socket) => {
       console.error("Error saving message:", error.message);
     }
   });
+  socket.on("user:typing", (room) => {
+    if (!room) {
+      return;
+    }
+
+    socket.to(room).emit("user:typing", {
+      username: socket.username,
+    });
+  });
+  socket.on("user:stop-typing", (room) => {
+    if (!room) return;
+
+    socket.to(room).emit("user:stop-typing", {
+      username: socket.username,
+    });
+  });
 };
